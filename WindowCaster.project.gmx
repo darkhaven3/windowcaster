@@ -115,7 +115,6 @@
       <sprite>sprites\fern</sprite>
       <sprite>sprites\tallstone1</sprite>
       <sprite>sprites\pillar1</sprite>
-      <sprite>sprites\door2</sprite>
       <sprites name="mons">
         <sprite>sprites\spr_superjumpy</sprite>
         <sprite>sprites\impaledskel</sprite>
@@ -162,6 +161,8 @@
       <script>scripts\I_Quit.gml</script>
       <script>scripts\I_ShutDown.gml</script>
       <script>scripts\I_GetEngineState.gml</script>
+      <script>scripts\I_EngineCall.gml</script>
+      <script>scripts\I_EnumsInit.gml</script>
     </scripts>
     <scripts name="audio">
       <script>scripts\S_InitMusic.gml</script>
@@ -283,7 +284,7 @@
       <room>rooms\levelarena</room>
     </rooms>
   </rooms>
-  <constants number="16">
+  <constants number="17">
     <constant name="ENGINE_VERSION">"0.25"</constant>
     <constant name="PATH_BASE">working_directory+"Tmp/"</constant>
     <constant name="PATH_TEXTURES">PATH_BASE+"Textures/"</constant>
@@ -300,6 +301,7 @@
     <constant name="R_LIGHTING_ENABLED">false</constant>
     <constant name="G_SKIP_INTRO">false</constant>
     <constant name="MAXARCHETYPES">10</constant>
+    <constant name="MAXSCREENSHOTS">99</constant>
   </constants>
   <help>
     <rtf>help.rtf</rtf>

@@ -88,15 +88,6 @@
     
     var global.alpha = 1.0;
     var global.pulsestate = 0;
-    
-    enum editmode {
-        floors = 0,
-        ceilings = 1,
-        wallh = 2,
-        wallv = 3,
-        doors = 4,
-        NUMMODES
-    }
 
     global.gamerunning=true;
     
@@ -147,7 +138,7 @@
 {
     var i=0;
 
-    for(i=0;i&lt;global.MAXSCREENSHOTS;i++) {
+    for(i=0;i&lt;MAXSCREENSHOTS;i++) {
         if(!file_exists("caster"+string(i)+".png")) {
             screenshotnum = i;
             exit;

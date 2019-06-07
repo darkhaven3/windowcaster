@@ -26,9 +26,12 @@
           <argument>
             <kind>1</kind>
             <string>    sprite_index = blanks;
+
     //GameState = instance_create(0,0,__GameManager); //deprecated
     GameMan = instance_create(0,0,__GameManager);
     Textures = 0;
+    
+    I_EnumsInit();
 </string>
           </argument>
         </arguments>
