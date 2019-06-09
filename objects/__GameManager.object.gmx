@@ -11,60 +11,6 @@
     <event eventtype="0" enumb="0">
       <action>
         <libid>1</libid>
-        <id>605</id>
-        <kind>0</kind>
-        <userelative>0</userelative>
-        <isquestion>0</isquestion>
-        <useapplyto>0</useapplyto>
-        <exetype>0</exetype>
-        <functionname></functionname>
-        <codestring></codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
-        <arguments>
-          <argument>
-            <kind>1</kind>
-            <string>game version check, init</string>
-          </argument>
-        </arguments>
-      </action>
-      <action>
-        <libid>1</libid>
-        <id>422</id>
-        <kind>1</kind>
-        <userelative>0</userelative>
-        <isquestion>0</isquestion>
-        <useapplyto>0</useapplyto>
-        <exetype>0</exetype>
-        <functionname></functionname>
-        <codestring></codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
-      </action>
-      <action>
-        <libid>1</libid>
-        <id>605</id>
-        <kind>0</kind>
-        <userelative>0</userelative>
-        <isquestion>0</isquestion>
-        <useapplyto>0</useapplyto>
-        <exetype>0</exetype>
-        <functionname></functionname>
-        <codestring></codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
-        <arguments>
-          <argument>
-            <kind>1</kind>
-            <string>init</string>
-          </argument>
-        </arguments>
-      </action>
-      <action>
-        <libid>1</libid>
         <id>603</id>
         <kind>7</kind>
         <userelative>0</userelative>
@@ -79,528 +25,50 @@
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>///Enums, defines, and hacks
+            <string>///Most of the boot process happens here
 
+///////////////////////////////////////
+
+//game version information
+version_string = "no game data";
+version_id = installtype.unknown;
+
+//special bootup vars
 cancontinue = false;
 
-// defines
-global.numlights=0;
-global.numargs=parameter_count();
-global.args[0]=0;
-global.modpk3[0]=0;
+///////////////////////////////////////
 
-//config properties
-var global.skipintro = 0;
-var global.autoskipconsole = 0;
+//pk3 directory cleanup
+Z_Cleanup();
 
-var global.introscreen = 0;
-var global.originscreen= 0;
-var global.backdropscreen = 0;
-var global.optionscreen = 0;
-var global.sevensixtwoscreen = 0;
+//if a mod exists, load it
+Z_Open(working_directory+"mod.pk3");
 
-var i=0;
+//system variables, some backend stuff
+I_GlobalSetup();
+I_DoParameters();
 
-for(i=0; i&lt; global.numargs; i += 1) {
-    global.args[i]=parameter_string(i+1);
-}
-
-for(i=0;i &lt; 8; i+=1) {
-    global.modpk3[i]=0;
-}
-
-//
-// some preparation first
-// we need to define our enums
-// and a few other data types here first.
-//
-{
-
-    //now the libfile handles
-    var global.ravdata = 0;
-    var global.shadowlib = 0;
-    var global.shadow2lib = 0;
-    var global.hdcastr = 0;
-    var global.cdcastr = 0;
-
-    //and the number of entries in each
-    var global.ravdata_numentries = 0;
-    var global.shadowlib_numentries = 0;
-    var global.shadow2lib_numentries = 0;
-    var global.hdcastr_numentries = 0;
-    var global.cdcastr_numentries = 0;
+//config file
+SE_InitGameSettings();
     
-    var global.shadowlib_info[0]=0;
-    var global.ravdata_info[0]=0;
+//audio
+S_InitMusic();
 
-    var global.tmpsurf=0;
-    var global.tmptexture[0]=0;
-    var global.systemmsg="";
+//now we check the game version. then we boot, hopefully!
+I_InitGameVersion();
 
-    
-    var global.mapbuf_tile_floors[0]=0;
-    var global.mapbuf_tile_floorh[0]=0;
-    var global.mapbuf_tile_ceils[0]=0;
-    var global.mapbuf_tile_ceilh[0]=0;
-    var global.mapbuf_tile_wallv[0]=0;
-    var global.mapbuf_tile_unkdata_wv[0]=0;
-    var global.mapbuf_tile_wallh[0]=0;
-    var global.mapbuf_tile_unkdata_wh[0]=0;
-    var global.mapbuf_tile_packdoors[0]=0;
-    var global.mapbuf_tile_unused[0]=0;
-    
-    var global.musiclist[0]=0;
-    var global.musfiles[0]=0;
-    var global.musicinstalled=0;
-    var global.musicenabled=1;
-    var global.currentmusic=0;
+//open libs and dats, then enumerate their contents
+CA_OpenLibs();
+CA_BuildInfoTables();
 
-    var global.maxlevel = 20;
-    var global.currentlevel = 0;
-    
-    //CONFIG
-    SE_OpenConfigFile();
-    SE_InitGameSettings();
-    SE_CloseConfigFile();
+//create the game palette
+G_CreatePalette("palette");
 
-    //now we have to init all this shit because GML
+//we can now draw version information and continue
+global.drawver = true;
 
-    var i=0;
-
-    for(i=0;i&lt;1024;i++) {
-        global.mapbuf_tile_floors[i]=0;
-    }
-    for(i=0;i&lt;1024;i++) {
-        global.mapbuf_tile_floorh[i]=0;
-    }
-    for(i=0;i&lt;1024;i++) {
-        global.mapbuf_tile_ceils[i]=0;
-    }
-    for(i=0;i&lt;1024;i++) {
-        global.mapbuf_tile_ceilh[i]=0;
-    }
-    for(i=0;i&lt;1024;i++) {
-        global.mapbuf_tile_wallv[i]=0;
-    }
-    for(i=0;i&lt;1024;i++) {
-        global.mapbuf_tile_unkdata_wv[i]=0;
-    }
-    for(i=0;i&lt;1024;i++) {
-        global.mapbuf_tile_wallh[i]=0;
-    }
-    for(i=0;i&lt;1024;i++) {
-        global.mapbuf_tile_unkdata_wh[i]=0;
-    }
-    for(i=0;i&lt;1024;i++) {
-        global.mapbuf_tile_packdoors[i]=0;
-    }
-    for(i=0;i&lt;1024;i++) {
-        global.mapbuf_tile_unused[i]=0;
-    }
-    for(i=0;i&lt;64*200;i++) {
-        global.tmptexture[i]=0;
-    }
-    for(i=0;i&lt;256;i++) {
-        global.texturelist[i]=0;
-    }
-
-    for(i=0;i&lt;musics.NUMMUSICS;i++) {
-        global.musiclist[i]=0;
-    }
-
-}
-</string>
-          </argument>
-        </arguments>
-      </action>
-      <action>
-        <libid>1</libid>
-        <id>603</id>
-        <kind>7</kind>
-        <userelative>0</userelative>
-        <isquestion>0</isquestion>
-        <useapplyto>-1</useapplyto>
-        <exetype>2</exetype>
-        <functionname></functionname>
-        <codestring></codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
-        <arguments>
-          <argument>
-            <kind>1</kind>
-            <string>///Additional enums - thing gameplay properties
-{
-    //resistances table
-    enum resist {
-        physical = 0,
-        cold     = 1,
-        fire     = 2,
-        electric = 3,
-        death    = 4,
-        slow     = 5,
-        magic    = 6,
-        fear     = 7,
-        paralyze = 8,
-        sonic    = 9,
-        mystery  = 10,
-            NUMRESISTANCES
-    }
-}
-</string>
-          </argument>
-        </arguments>
-      </action>
-      <action>
-        <libid>1</libid>
-        <id>603</id>
-        <kind>7</kind>
-        <userelative>0</userelative>
-        <isquestion>0</isquestion>
-        <useapplyto>-1</useapplyto>
-        <exetype>2</exetype>
-        <functionname></functionname>
-        <codestring></codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
-        <arguments>
-          <argument>
-            <kind>1</kind>
-            <string>///RPG elements
-{
-    var global.xptonext = 1500;
-    var global.maparcs[0] = 0;
-    global.maparcs[10]= 0;
-    
-    var global.itemtype[0] = 0;
-    global.itemtype[255]   = 0;
-}
-</string>
-          </argument>
-        </arguments>
-      </action>
-      <action>
-        <libid>1</libid>
-        <id>605</id>
-        <kind>0</kind>
-        <userelative>0</userelative>
-        <isquestion>0</isquestion>
-        <useapplyto>0</useapplyto>
-        <exetype>0</exetype>
-        <functionname></functionname>
-        <codestring></codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
-        <arguments>
-          <argument>
-            <kind>1</kind>
-            <string>audio</string>
-          </argument>
-        </arguments>
-      </action>
-      <action>
-        <libid>1</libid>
-        <id>603</id>
-        <kind>7</kind>
-        <userelative>0</userelative>
-        <isquestion>0</isquestion>
-        <useapplyto>-1</useapplyto>
-        <exetype>2</exetype>
-        <functionname></functionname>
-        <codestring></codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
-        <arguments>
-          <argument>
-            <kind>1</kind>
-            <string>{
-    S_InitMusic();
-    global.currentmusic = 0;
-
-}
-</string>
-          </argument>
-        </arguments>
-      </action>
-      <action>
-        <libid>1</libid>
-        <id>605</id>
-        <kind>0</kind>
-        <userelative>0</userelative>
-        <isquestion>0</isquestion>
-        <useapplyto>0</useapplyto>
-        <exetype>0</exetype>
-        <functionname></functionname>
-        <codestring></codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
-        <arguments>
-          <argument>
-            <kind>1</kind>
-            <string>libs</string>
-          </argument>
-        </arguments>
-      </action>
-      <action>
-        <libid>1</libid>
-        <id>603</id>
-        <kind>7</kind>
-        <userelative>0</userelative>
-        <isquestion>0</isquestion>
-        <useapplyto>-1</useapplyto>
-        <exetype>2</exetype>
-        <functionname></functionname>
-        <codestring></codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
-        <arguments>
-          <argument>
-            <kind>1</kind>
-            <string>//
-//  now we init global variables and check the game version. then we boot, hopefully!
-//
-    global.cfgfile=-1;
-    version_string = "no game data";
-    version_id = installtype.unknown;
-
-    I_InitGameVersion();
-    
-    var global.font=0;
-
-    if(directory_exists(PATH_BASE)) {
-        directory_destroy(PATH_BASE);
-    }
-
-    var global.ravenpk3 = Z_Open(working_directory+"raven.pk3");
-
-    var global.drawver=0;
-    
-    if(file_exists(working_directory+"mod.pk3")) {
-        global.modpk3[0] = Z_Open(working_directory+"mod.pk3");
-    }
-
-    //if the floppy version is detected...
-    if(global.gameversion = installtype.floppy) {
-    
-        window_set_caption("WindowCaster "+ENGINE_VERSION+": Shadowcaster Floppy 1.12F");
-        global.ravdata = _CA_OpenLib("RAVDATA.DAT");
-        global.shadowlib = _CA_OpenLib("SHADOW.LIB");
-        global.shadow2lib = _CA_OpenLib("SHADOW2.LIB");
-
-        global.ravdata_numentries = CA_NumEntriesDat(global.ravdata);
-        global.shadowlib_numentries = CA_NumEntriesLib(global.shadowlib);
-        global.shadow2lib_numentries = CA_NumEntriesLib(global.shadow2lib);
-        
-        global.font = font_add_sprite(casterfont,ord('!'),false,0);
-        
-    }
-
-    //if the cd version is detected...
-    else if(global.gameversion = installtype.cd) {
-        
-        window_set_caption("WindowCaster "+ENGINE_VERSION+": Shadowcaster CD 1.01F");
-        global.shadowlib = _CA_OpenLib("SHADOW.LIB");
-        global.shadow2lib = _CA_OpenLib("SHADOW2.LIB");
-        global.hdcastr = _CA_OpenLib("HD_CASTR.DAT");
-        global.cdcastr = _CA_OpenLib("CD_CASTR.DAT");
-
-        global.hdcastr_numentries = CA_NumEntriesDat(global.hdcastr);
-        global.cdcastr_numentries = CA_NumEntriesDat(global.cdcastr);
-        global.shadowlib_numentries = CA_NumEntriesLib(global.shadowlib);
-        global.shadow2lib_numentries = CA_NumEntriesLib(global.shadow2lib);
-
-    }
-    
-    else if(global.gameversion = installtype.unknown) {
-        I_Quit("__GameManager: no game data");
-    }
-</string>
-          </argument>
-        </arguments>
-      </action>
-      <action>
-        <libid>1</libid>
-        <id>601</id>
-        <kind>0</kind>
-        <userelative>0</userelative>
-        <isquestion>0</isquestion>
-        <useapplyto>-1</useapplyto>
-        <exetype>1</exetype>
-        <functionname>action_execute_script</functionname>
-        <codestring></codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
-        <arguments>
-          <argument>
-            <kind>9</kind>
-            <script>CA_BuildInfoTables</script>
-          </argument>
-          <argument>
-            <kind>0</kind>
-            <string></string>
-          </argument>
-          <argument>
-            <kind>0</kind>
-            <string></string>
-          </argument>
-          <argument>
-            <kind>0</kind>
-            <string></string>
-          </argument>
-          <argument>
-            <kind>0</kind>
-            <string></string>
-          </argument>
-          <argument>
-            <kind>0</kind>
-            <string></string>
-          </argument>
-        </arguments>
-      </action>
-      <action>
-        <libid>1</libid>
-        <id>301</id>
-        <kind>0</kind>
-        <userelative>-1</userelative>
-        <isquestion>0</isquestion>
-        <useapplyto>-1</useapplyto>
-        <exetype>1</exetype>
-        <functionname>action_set_alarm</functionname>
-        <codestring></codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
-        <arguments>
-          <argument>
-            <kind>0</kind>
-            <string>5</string>
-          </argument>
-          <argument>
-            <kind>4</kind>
-            <string>0</string>
-          </argument>
-        </arguments>
-      </action>
-      <action>
-        <libid>1</libid>
-        <id>424</id>
-        <kind>2</kind>
-        <userelative>0</userelative>
-        <isquestion>0</isquestion>
-        <useapplyto>0</useapplyto>
-        <exetype>0</exetype>
-        <functionname></functionname>
-        <codestring></codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
-      </action>
-    </event>
-    <event eventtype="2" enumb="1">
-      <action>
-        <libid>1</libid>
-        <id>612</id>
-        <kind>0</kind>
-        <userelative>0</userelative>
-        <isquestion>-1</isquestion>
-        <useapplyto>-1</useapplyto>
-        <exetype>1</exetype>
-        <functionname>action_if_variable</functionname>
-        <codestring></codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
-        <arguments>
-          <argument>
-            <kind>0</kind>
-            <string>global.gameversion</string>
-          </argument>
-          <argument>
-            <kind>0</kind>
-            <string>2</string>
-          </argument>
-          <argument>
-            <kind>4</kind>
-            <string>1</string>
-          </argument>
-        </arguments>
-      </action>
-      <action>
-        <libid>1</libid>
-        <id>422</id>
-        <kind>1</kind>
-        <userelative>0</userelative>
-        <isquestion>0</isquestion>
-        <useapplyto>0</useapplyto>
-        <exetype>0</exetype>
-        <functionname></functionname>
-        <codestring></codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
-      </action>
-      <action>
-        <libid>1</libid>
-        <id>611</id>
-        <kind>6</kind>
-        <userelative>-1</userelative>
-        <isquestion>0</isquestion>
-        <useapplyto>-1</useapplyto>
-        <exetype>2</exetype>
-        <functionname></functionname>
-        <codestring></codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
-        <arguments>
-          <argument>
-            <kind>1</kind>
-            <string>cancontinue</string>
-          </argument>
-          <argument>
-            <kind>0</kind>
-            <string>true</string>
-          </argument>
-        </arguments>
-      </action>
-      <action>
-        <libid>1</libid>
-        <id>424</id>
-        <kind>2</kind>
-        <userelative>0</userelative>
-        <isquestion>0</isquestion>
-        <useapplyto>0</useapplyto>
-        <exetype>0</exetype>
-        <functionname></functionname>
-        <codestring></codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
-      </action>
-      <action>
-        <libid>1</libid>
-        <id>603</id>
-        <kind>7</kind>
-        <userelative>0</userelative>
-        <isquestion>0</isquestion>
-        <useapplyto>-1</useapplyto>
-        <exetype>2</exetype>
-        <functionname></functionname>
-        <codestring></codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
-        <arguments>
-          <argument>
-            <kind>1</kind>
-            <string>__EngineManager.Textures    = instance_create(0,0,__TextureManager);
-__EngineManager.TextModeMan = instance_create(0,0,__TextModeManager);
+//I really wish I didn't have to do this through an alarm.
+alarm[0] = 2;
 </string>
           </argument>
         </arguments>
@@ -609,30 +77,6 @@ __EngineManager.TextModeMan = instance_create(0,0,__TextModeManager);
     <event eventtype="2" enumb="0">
       <action>
         <libid>1</libid>
-        <id>611</id>
-        <kind>6</kind>
-        <userelative>-1</userelative>
-        <isquestion>0</isquestion>
-        <useapplyto>-1</useapplyto>
-        <exetype>2</exetype>
-        <functionname></functionname>
-        <codestring></codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
-        <arguments>
-          <argument>
-            <kind>1</kind>
-            <string>global.drawver</string>
-          </argument>
-          <argument>
-            <kind>0</kind>
-            <string>true</string>
-          </argument>
-        </arguments>
-      </action>
-      <action>
-        <libid>1</libid>
         <id>603</id>
         <kind>7</kind>
         <userelative>0</userelative>
@@ -647,36 +91,16 @@ __EngineManager.TextModeMan = instance_create(0,0,__TextModeManager);
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>{
-    global.palette[0]=0;
-    global.palette[255]=0;
-    G_CreatePalette("palette");
+            <string>///create texture and text mode managers.
+
+//i hate this magic number and alarms shit and i want it to go away.
+//if a valid game version is found, create the texture and textmode managers.
+if(global.gameversion &lt; 2) {
+__EngineManager.Textures    = instance_create(0,0,__TextureManager);
+__EngineManager.TextModeMan = instance_create(0,0,__TextModeManager);
+cancontinue = true;
 }
 </string>
-          </argument>
-        </arguments>
-      </action>
-      <action>
-        <libid>1</libid>
-        <id>301</id>
-        <kind>0</kind>
-        <userelative>-1</userelative>
-        <isquestion>0</isquestion>
-        <useapplyto>-1</useapplyto>
-        <exetype>1</exetype>
-        <functionname>action_set_alarm</functionname>
-        <codestring></codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
-        <arguments>
-          <argument>
-            <kind>0</kind>
-            <string>5</string>
-          </argument>
-          <argument>
-            <kind>4</kind>
-            <string>1</string>
           </argument>
         </arguments>
       </action>
@@ -684,86 +108,6 @@ __EngineManager.TextModeMan = instance_create(0,0,__TextModeManager);
     <event eventtype="9" enumb="1">
       <action>
         <libid>1</libid>
-        <id>612</id>
-        <kind>0</kind>
-        <userelative>0</userelative>
-        <isquestion>-1</isquestion>
-        <useapplyto>-1</useapplyto>
-        <exetype>1</exetype>
-        <functionname>action_if_variable</functionname>
-        <codestring></codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
-        <arguments>
-          <argument>
-            <kind>0</kind>
-            <string>cancontinue</string>
-          </argument>
-          <argument>
-            <kind>0</kind>
-            <string>true</string>
-          </argument>
-          <argument>
-            <kind>4</kind>
-            <string>0</string>
-          </argument>
-        </arguments>
-      </action>
-      <action>
-        <libid>1</libid>
-        <id>422</id>
-        <kind>1</kind>
-        <userelative>0</userelative>
-        <isquestion>0</isquestion>
-        <useapplyto>0</useapplyto>
-        <exetype>0</exetype>
-        <functionname></functionname>
-        <codestring></codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
-      </action>
-      <action>
-        <libid>1</libid>
-        <id>611</id>
-        <kind>6</kind>
-        <userelative>-1</userelative>
-        <isquestion>0</isquestion>
-        <useapplyto>-1</useapplyto>
-        <exetype>2</exetype>
-        <functionname></functionname>
-        <codestring></codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
-        <arguments>
-          <argument>
-            <kind>1</kind>
-            <string>cancontinue</string>
-          </argument>
-          <argument>
-            <kind>0</kind>
-            <string>false</string>
-          </argument>
-        </arguments>
-      </action>
-      <action>
-        <libid>1</libid>
-        <id>422</id>
-        <kind>1</kind>
-        <userelative>0</userelative>
-        <isquestion>0</isquestion>
-        <useapplyto>0</useapplyto>
-        <exetype>0</exetype>
-        <functionname></functionname>
-        <codestring></codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
-      </action>
-      <action>
-        <libid>1</libid>
         <id>603</id>
         <kind>7</kind>
         <userelative>0</userelative>
@@ -778,55 +122,17 @@ __EngineManager.TextModeMan = instance_create(0,0,__TextModeManager);
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>{
+            <string>///if we're allowed to skip the intro, do so
+if(cancontinue) {
+    cancontinue = false;
+
     if(G_SKIP_INTRO) room_goto(g_menu);
     else room_goto(introarena);
+    instance_destroy(self); //we ought to keep this object around, pending better way to do this
 }
 </string>
           </argument>
         </arguments>
-      </action>
-      <action>
-        <libid>1</libid>
-        <id>203</id>
-        <kind>0</kind>
-        <userelative>0</userelative>
-        <isquestion>0</isquestion>
-        <useapplyto>-1</useapplyto>
-        <exetype>1</exetype>
-        <functionname>action_kill_object</functionname>
-        <codestring></codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
-      </action>
-      <action>
-        <libid>1</libid>
-        <id>424</id>
-        <kind>2</kind>
-        <userelative>0</userelative>
-        <isquestion>0</isquestion>
-        <useapplyto>0</useapplyto>
-        <exetype>0</exetype>
-        <functionname></functionname>
-        <codestring></codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
-      </action>
-      <action>
-        <libid>1</libid>
-        <id>424</id>
-        <kind>2</kind>
-        <userelative>0</userelative>
-        <isquestion>0</isquestion>
-        <useapplyto>0</useapplyto>
-        <exetype>0</exetype>
-        <functionname></functionname>
-        <codestring></codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
       </action>
     </event>
   </events>

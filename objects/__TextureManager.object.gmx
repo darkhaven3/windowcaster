@@ -25,175 +25,20 @@
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>{
-    sprite_index = blanks;
+            <string>    sprite_index = blanks;
 
     var file;
-    var global.numtextures=0;
-    var global.numflats=0;
-    
-    var global.TextureReference = ds_map_create();
-    var global.SpriteReference  = ds_map_create();
-    
     var tmpstring;
     var tmpstring2;
     var tmptex;
     var tmpinfo;
-    
-    
-    var i=0;
 
     G_LoadAllFlats();
-
-    //open floor table
-    
-    if(file_exists(SCRIPT_PATH_FLOOR_TEXTURES)) {
-    ini_open(SCRIPT_PATH_FLOOR_TEXTURES);
-
-    if(!ini_section_exists("floors"))
-        I_Quit("__TextureManager: One of the loaded PK3s has malformed floor texture definitions");
-    
-    for(i=0;i&lt;256;++i) {
-        tmpstring = "floor"+string(i);
-        tmpstring2 = ini_read_string("floors",string(i),"badflat.png");
-        tmptex = PATH_TEXTURES+tmpstring2;
-        
-        //texture definition does not already exist
-        if(!ds_map_exists(global.TextureReference,tmpstring)) {
-            if(!file_exists(tmptex))
-                ds_map_add(global.TextureReference,tmpstring,BADFLAT);
-        
-            else {
-                tmptex=background_add(tmptex,false,false);
-                ds_map_add(global.TextureReference,tmpstring,tmptex);
-                global.numflats++;
-            }
-        }
-        
-        //texture definition does already exist
-        else if(ds_map_exists(global.TextureReference,tmpstring)) {
-            if(!file_exists(tmptex)) {
-                //debug
-                //ds_map_replace(global.TextureReference,tmpstring,BADFLAT);
-                continue;
-            }
-            else {
-                tmptex=background_add(tmptex,false,false);
-                ds_map_replace(global.TextureReference,tmpstring,tmptex);
-            }
-        }
-    }
-    
-    ini_close();
-    
-    }
-
-//
-
-/*
-    // This function should not be needed for Shadowcaster.
-    // Un-comment this section to re-enable loading of ceiling textures as a separate list.
-    ini_open(SCRIPT_PATH_CEILING_TEXTURES);
-
-    if(!ini_section_exists("ceils"))
-        I_Quit("__TextureManager: One of the loaded PK3s has malformed ceiling texture definitions");
-    
-    for(i=0;i&lt;256;++i) {
-        tmpstring = "ceil"+string(i);
-        tmpstring2 = ini_read_string("ceilings",string(i),"-1");
-        
-        if(tmpstring2 = "-1") continue;
-        
-        tmptex = PATH_TEXTURES+tmpstring2;
-        
-        if(!file_exists(tmptex))
-            ds_map_add(TextureReference,tmpstring,BADFLAT);
-        
-        else {
-            tmptex=background_add(tmptex,false,false);
-            ds_map_add(TextureReference,tmpstring,tmptex);
-            global.numflats++;
-        }
-    }
-    
-    ini_close();
-
-*/
-
-//
-
     G_LoadAllWalls();
-
-    //open wall table
-    if(file_exists(SCRIPT_PATH_WALL_TEXTURES)) {
+    G_LoadSprites();
     
-    ini_open(SCRIPT_PATH_WALL_TEXTURES);
-
-    if(!ini_section_exists("walls"))
-        I_Quit("__TextureManager: One of the loaded PK3s has malformed wall texture definitions");
-    
-    for(i=0;i&lt;256;++i) {
-        tmpstring = "wall"+string(i);
-        tmpstring2 = ini_read_string("walls",string(i),"badflat.png");
-        
-        tmptex = PATH_TEXTURES+tmpstring2;
-
-        //texture definition does not already exist
-        if(!ds_map_exists(global.TextureReference,tmpstring)) {
-            if(!file_exists(tmptex))
-                ds_map_add(global.TextureReference,tmpstring,BADFLAT);
-        
-            else {
-                tmptex=background_add(tmptex,false,false);
-                ds_map_add(global.TextureReference,tmpstring,tmptex);
-                global.numtextures++;
-            }
-        }
-        
-        //texture definition does already exist
-        else if(ds_map_exists(global.TextureReference,tmpstring)) {
-            if(!file_exists(tmptex)) {
-                //debug
-                //ds_map_replace(global.TextureReference,tmpstring,BADFLAT);
-                continue;
-            }
-            else {
-                tmptex=background_add(tmptex,false,false);
-                ds_map_replace(global.TextureReference,tmpstring,tmptex);
-            }
-        }
-    }
-    
-    ini_close();
-    
-    }
-    //end wall table parse block
-    
-    //begin sprite load block
-    
-    var startsprites = CA_CheckNumForNameDat("startsprites")+1;
-    var endsprites   = CA_CheckNumForNameDat("endsprites");
-    
-    var numsprites   = endsprites - startsprites;
-    
-    for(i=0;i &lt; numsprites;i++) {
-        tmpinfo = global.ravdata_info[startsprites+i];
-        tmpstring = tmpinfo.name+".png";
-        
-        if(!file_exists(PATH_SPRITES+tmpstring)) ds_map_add(global.SpriteReference,tmpinfo.name,_Dont_Place);
-        else {
-            tmptex = sprite_add(PATH_SPRITES+tmpstring,0,false,false,0,0);
-            ds_map_add(global.SpriteReference,tmpinfo.name,tmptex);
-        }
-    }
-    
-    //screens
-    global.originscreen = background_add(working_directory+"Tmp/Screens/origin.png",0,0);
-    global.introscreen = background_add(working_directory+"Tmp/Screens/title.png",0,0);
-    global.optionscreen = background_add(working_directory+"Tmp/Screens/option.png",0,0);
-    global.backdropscreen = background_add(working_directory+"Tmp/Screens/backdrop.png",0,0);
-    global.sevensixtwoscreen = background_add(working_directory+"Tmp/Screens/762i.png",0,0);
-}
+    G_LoadExternalTextures();
+    G_LoadExternalScreens();
 </string>
           </argument>
         </arguments>

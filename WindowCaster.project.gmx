@@ -163,6 +163,8 @@
       <script>scripts\I_GetEngineState.gml</script>
       <script>scripts\I_EngineCall.gml</script>
       <script>scripts\I_EnumsInit.gml</script>
+      <script>scripts\I_GlobalSetup.gml</script>
+      <script>scripts\I_DoParameters.gml</script>
     </scripts>
     <scripts name="audio">
       <script>scripts\S_InitMusic.gml</script>
@@ -175,14 +177,18 @@
     </scripts>
     <scripts name="zip">
       <script>scripts\Z_Open.gml</script>
+      <script>scripts\Z_Cleanup.gml</script>
     </scripts>
     <scripts name="graphics">
-      <script>scripts\G_LoadWall.gml</script>
-      <script>scripts\G_LoadAllWalls.gml</script>
-      <script>scripts\G_LoadFlat.gml</script>
-      <script>scripts\G_LoadAllFlats.gml</script>
       <script>scripts\G_CreatePalette.gml</script>
+      <script>scripts\G_LoadWall.gml</script>
+      <script>scripts\G_LoadFlat.gml</script>
+      <script>scripts\G_LoadAllWalls.gml</script>
+      <script>scripts\G_LoadAllFlats.gml</script>
       <script>scripts\G_LoadSprite.gml</script>
+      <script>scripts\G_LoadSprites.gml</script>
+      <script>scripts\G_LoadExternalTextures.gml</script>
+      <script>scripts\G_LoadExternalScreens.gml</script>
     </scripts>
     <scripts name="mapeditor">
       <script>scripts\ME_UpdateHighlight.gml</script>
@@ -194,8 +200,6 @@
       <script>scripts\ME_UpdateCellCeiling.gml</script>
     </scripts>
     <scripts name="config">
-      <script>scripts\SE_OpenConfigFile.gml</script>
-      <script>scripts\SE_CloseConfigFile.gml</script>
       <script>scripts\SE_InitGameSettings.gml</script>
     </scripts>
     <scripts name="gamescript">

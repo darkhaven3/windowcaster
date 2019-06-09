@@ -1,53 +1,33 @@
-{
-
-    //
-    // floppy version
-    //
-    if(global.gameversion == 0) {
-        if(!file_exists(working_directory+"SHADOW.LIB") || !file_exists(working_directory+"SHADOW2.LIB")) {
-            I_Quit("CA_OpenLib: no game data!");
-        }
-        
-        else {
-            global.shadowlib = buffer_load(working_directory+"SHADOW.LIB");
-            global.shadow2lib = buffer_load(working_directory+"SHADOW2.LIB");
-            global.ravdata = buffer_load(working_directory+"RAVDATA.DAT");
-            
-            global.shadowlib_numentries = CA_NumEntriesLib(global.shadowlib);
-            global.shadow2lib_numentries = CA_NumEntriesLib(global.shadow2lib);
-            global.ravdata_numentries = CA_NumEntriesDat(global.ravdata);
-        }
-    }
-    //
+    //if the floppy version is detected...
+    if(global.gameversion = installtype.floppy) {
     
-    //
-    // cd version
-    //
-    else if(global.gameversion == 1) {
-        if(!file_exists(working_directory+"SHADOW.LIB") || !file_exists(working_directory+"SHADOW2.LIB")) {
-            I_Quit("CA_OpenLibs: can't find SHADOW.LIB/SHADOW2.LIB!");
-        }
-        
-        if(!file_exists(working_directory+"HD_CASTR.DAT") || !file_exists(working_directory+"CD_CASTR.DAT")) {
-            I_Quit("CA_OpenLibs: gameversion inconsistent?");
-        }
+        window_set_caption("WindowCaster "+ENGINE_VERSION+": Shadowcaster Floppy 1.12F");
+        global.ravdata = _CA_OpenLib("RAVDATA.DAT");
+        global.shadowlib = _CA_OpenLib("SHADOW.LIB");
+        global.shadow2lib = _CA_OpenLib("SHADOW2.LIB");
 
-        else {
-            global.shadowlib = buffer_load(working_directory+"SHADOW.LIB");
-            global.shadow2lib = buffer_load(working_directory+"SHADOW2.LIB");
-            global.hdcastr = buffer_load(working_directory+"HD_CASTR.DAT");
-            global.cdcastr = buffer_load(working_directory+"CD_CASTR.DAT");
-
-            global.shadowlib_numentries = CA_NumEntriesLib(global.shadowlib);
-            global.shadow2lib_numentries = CA_NumEntriesLib(global.shadow2lib);
-            global.hdcastr_numentries = CA_NumEntriesDat(global.hdcastr);
-            global.cdcastr_numentries = CA_NumEntriesDat(global.cdcastr);
+        global.ravdata_numentries = CA_NumEntriesDat(global.ravdata);
+        global.shadowlib_numentries = CA_NumEntriesLib(global.shadowlib);
+        global.shadow2lib_numentries = CA_NumEntriesLib(global.shadow2lib);
         
-            draw_text(1,20,"CA_OpenLibs: found CD version");
-        }
+    }
+
+    //if the cd version is detected...
+    else if(global.gameversion = installtype.cd) {
+        
+        window_set_caption("WindowCaster "+ENGINE_VERSION+": Shadowcaster CD 1.01F");
+        global.shadowlib = _CA_OpenLib("SHADOW.LIB");
+        global.shadow2lib = _CA_OpenLib("SHADOW2.LIB");
+        global.hdcastr = _CA_OpenLib("HD_CASTR.DAT");
+        global.cdcastr = _CA_OpenLib("CD_CASTR.DAT");
+
+        global.hdcastr_numentries = CA_NumEntriesDat(global.hdcastr);
+        global.cdcastr_numentries = CA_NumEntriesDat(global.cdcastr);
+        global.shadowlib_numentries = CA_NumEntriesLib(global.shadowlib);
+        global.shadow2lib_numentries = CA_NumEntriesLib(global.shadow2lib);
+
     }
     
-    else {
-        draw_text(1,20,"CA_OpenLibs: Nothing opened");
+    else if(global.gameversion = installtype.unknown) {
+        I_Quit("__GameManager: no game data");
     }
-}

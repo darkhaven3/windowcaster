@@ -161,3 +161,19 @@ enum editmode {
         vestefin    = 20,
         NUMLEVELS   = 21
     }
+
+    //resistances table
+    enum resist {
+        physical = 0,
+        cold     = 1,
+        fire     = 2,
+        electric = 3,
+        death    = 4,
+        slow     = 5,
+        magic    = 6,
+        fear     = 7,
+        paralyze = 8,
+        sonic    = 9,
+        mystery  = 10,
+        NUMRESISTANCES
+    }
